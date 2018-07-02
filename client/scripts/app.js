@@ -3,7 +3,7 @@ var app = {
 
   //TODO: The current 'handleUsernameClick' function just toggles the class 'friend'
   //to all messages sent by the user
-  server: 'http://127.0.0.1:3000',
+  server: 'http://127.0.0.1:3000/classes/messages',
   username: 'anonymous',
   roomname: 'lobby',
   lastMessageId: 0,
@@ -63,6 +63,7 @@ var app = {
       type: 'GET',
       data: { order: '-createdAt' },
       success: function(data) {
+        console.log(data);
         // Don't bother if we have nothing to work with
         if (!data.results || !data.results.length) { return; }
 
@@ -226,11 +227,11 @@ var app = {
 
   startSpinner: function() {
     $('.spinner img').show();
-    $('form input[type=submit]').attr('disabled', 'true');
+    // $('form input[type=submit]').attr('disabled', 'true');
   },
 
   stopSpinner: function() {
     $('.spinner img').fadeOut('fast');
-    $('form input[type=submit]').attr('disabled', null);
+    // $('form input[type=submit]').attr('disabled', null);
   }
 };
