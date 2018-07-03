@@ -57,14 +57,22 @@ exports.requestHandler = function(request, response) {
 
   if (request.method === 'GET' && request.url === '/classes/messages') {
     response.end(JSON.stringify(messages));
-  } else if (request.method === 'POST' || request.method === 'OPTIONS' && request.url === '/classes/messages') {
+  } else if (request.method === 'POST' && request.url === '/classes/messages') {
     request.on('data', (chunk) => {
       chunk = JSON.parse(chunk);
-      messages.results.push(chunk)
+      messages.results.push(chunk);
     });
     response.writeHead(201, headers);
     response.end(JSON.stringify(messages));
-    
+     
+  } else if (request.method === 'OPTIONS' && request.url === '/classes/messages') {
+    response.end(defaultCorsHeaders['access-control-allow-methods']);
+  } else if (request.method === 'PUT' && request.url === '/classes/messages') {
+    response.writeHead(401, headers);
+    response.end();
+  } else if (request.method === 'DELETE') {
+    response.writeHead(405, headers);
+    response.end();
   } else {
     response.writeHead(404, headers);
     response.end();

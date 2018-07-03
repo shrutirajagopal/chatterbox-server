@@ -115,5 +115,44 @@ describe('Node Server Request Listener Function', function() {
         expect(res._responseCode).to.equal(404);
       });
   });
+  it('Should handle Options reqeusts with Cors headers methods', function() {
+    var req = new stubs.request('/classes/messages', 'OPTIONS');
+    var res = new stubs.response();
+
+    handler.requestHandler(req, res);
+
+    // Wait for response to return and then check status code
+    waitForThen(
+      function() { return res._ended; },
+      function() {
+        expect(res._ended).to.equal('GET, POST, PUT, DELETE, OPTIONS');
+      });
+  });
+  it('Should 401 for PUT Method', function() {
+    var req = new stubs.request('/classes/messages', 'PUT');
+    var res = new stubs.response();
+
+    handler.requestHandler(req, res);
+
+    // Wait for response to return and then check status code
+    waitForThen(
+      function() { return res._ended; },
+      function() {
+        expect(res._responseCode).to.equal(401);
+      });
+  });  
+  it('Should 405 for DELETE Method', function() {
+    var req = new stubs.request('/classes/messages', 'DELETE');
+    var res = new stubs.response();
+
+    handler.requestHandler(req, res);
+
+    // Wait for response to return and then check status code
+    waitForThen(
+      function() { return res._ended; },
+      function() {
+        expect(res._responseCode).to.equal(405);
+      });
+  });    
 
 });
