@@ -13,9 +13,9 @@ this file and include it in basic-server.js so that it actually works.
 **************************************************************/
 var fs = require('fs');
 var express = require('express');
-app = express();
+const app = express();
 
-var data = fs.readFileSync('messages.json');
+var data = fs.readFileSync('server/messages.json');
 var messages = JSON.parse(data);
 console.log(messages);
 
@@ -67,12 +67,13 @@ exports.requestHandler = function(request, response) {
   if (request.method === 'GET' && request.url === '/classes/messages') {
     
     response.end(JSON.stringify(messages));
+    
   } else if (request.method === 'POST' && request.url === '/classes/messages') {
     request.on('error', (err) => console.error(err));
     request.on('data', (chunk) => {
       chunk = JSON.parse(chunk);
       messages.results.push(chunk);
-      fs.readFile('messages.json', 'utf-8', (error, data) => {
+      fs.readFile('server/messages.json', 'utf-8', (error, data) => {
         if (error) {
           throw error;
         }
@@ -80,7 +81,7 @@ exports.requestHandler = function(request, response) {
         var msgData = JSON.parse(data);
         msgData.results.push(chunk);
         
-        fs.writeFile('messages.json', JSON.stringify(msgData), 'utf-8', function(error) {
+        fs.writeFile('server/messages.json', JSON.stringify(msgData), 'utf-8', function(error) {
           if (error) {
             throw error;
           }
