@@ -6,4 +6,4 @@ app.get('/', (req, res) => res.send('Hello World!'));
 
 app.use(express.static('/Users/student/Desktop/hrsf99-chatterbox-server/client/'));
 
-app.listen(8000, () => console.log('Example app listening http://127.0.0.1:8000/'));
+app.listen(8000, () => console.log('Example app listening http://127.0.0.1:80/'));
