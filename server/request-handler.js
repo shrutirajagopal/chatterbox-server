@@ -11,6 +11,13 @@ this file and include it in basic-server.js so that it actually works.
 *Hint* Check out the node module documentation at http://nodejs.org/api/modules.html.
 
 **************************************************************/
+var fs = require('fs');
+var express = require('express');
+app = express();
+
+var data = fs.readFileSync('messages.json');
+var messages = JSON.parse(data);
+console.log(messages);
 
 var defaultCorsHeaders = {
   'access-control-allow-origin': '*',
@@ -18,9 +25,11 @@ var defaultCorsHeaders = {
   'access-control-allow-headers': 'content-type, accept',
   'access-control-max-age': 10 // Seconds.
 };
-var messages = {results: []};
+
 
 exports.requestHandler = function(request, response) {
+  
+
   // Request and Response come from node's http module.
   //
   // They include information about both the incoming request, such as
@@ -56,11 +65,28 @@ exports.requestHandler = function(request, response) {
   
 
   if (request.method === 'GET' && request.url === '/classes/messages') {
+    
     response.end(JSON.stringify(messages));
   } else if (request.method === 'POST' && request.url === '/classes/messages') {
+    request.on('error', (err) => console.error(err));
     request.on('data', (chunk) => {
       chunk = JSON.parse(chunk);
       messages.results.push(chunk);
+      fs.readFile('messages.json', 'utf-8', (error, data) => {
+        if (error) {
+          throw error;
+        }
+          
+        var msgData = JSON.parse(data);
+        msgData.results.push(chunk);
+        
+        fs.writeFile('messages.json', JSON.stringify(msgData), 'utf-8', function(error) {
+          if (error) {
+            throw error;
+          }
+          console.log('all set');
+        });
+      });
     });
     response.writeHead(201, headers);
     response.end(JSON.stringify(messages));
