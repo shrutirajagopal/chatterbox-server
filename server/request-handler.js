@@ -11,8 +11,7 @@ this file and include it in basic-server.js so that it actually works.
 *Hint* Check out the node module documentation at http://nodejs.org/api/modules.html.
 
 **************************************************************/
-// var objectID = require('mongodb').ObjectID;
-const querystring = require('querystring');
+
 var defaultCorsHeaders = {
   'access-control-allow-origin': '*',
   'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS',
@@ -56,20 +55,20 @@ exports.requestHandler = function(request, response) {
   response.writeHead(statusCode, headers);
   
 
-  let body = [];
   if (request.method === 'GET' && request.url === '/classes/messages') {
     response.end(JSON.stringify(messages));
-  } else if (request.method === 'POST' ) {
-    request.on('data', (input) => {
-      var parsed = JSON.parse(input);
-      parsed.createdAt = new Date();
-      // parsed.objectID = new ObjectID();
-      messages.results.push(parsed);
-      console.log(parsed);
-      response.end(JSON.stringify(messages));
-    })
+  } else if (request.method === 'POST' || request.method === 'OPTIONS' && request.url === '/classes/messages') {
+    request.on('data', (chunk) => {
+      chunk = JSON.parse(chunk);
+      messages.results.push(chunk)
+    });
+    response.writeHead(201, headers);
+    response.end(JSON.stringify(messages));
+    
+  } else {
+    response.writeHead(404, headers);
+    response.end();
   }
-
 
   // Make sure to always call response.end() - Node may not send
   // anything back to the client until you do. The string you pass to
@@ -78,6 +77,7 @@ exports.requestHandler = function(request, response) {
   //
   // Calling .end "flushes" the response's internal buffer, forcing
   // node to actually send all the data over to the client.
+
 };
 
 
