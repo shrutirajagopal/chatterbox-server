@@ -11,6 +11,8 @@ this file and include it in basic-server.js so that it actually works.
 *Hint* Check out the node module documentation at http://nodejs.org/api/modules.html.
 
 **************************************************************/
+// var objectID = require('mongodb').ObjectID;
+const querystring = require('querystring');
 var defaultCorsHeaders = {
   'access-control-allow-origin': '*',
   'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS',
@@ -47,39 +49,28 @@ exports.requestHandler = function(request, response) {
   //
   // You will need to change this if you are sending something
   // other than plain text, like JSON or HTML.
-  headers['Content-Type'] = 'application/JSON';
+  headers['Content-Type'] = 'application/json';
 
   // .writeHead() writes to the request line and headers of the response,
   // which includes the status and all headers.
   response.writeHead(statusCode, headers);
   
-  //sample request flow:
-  //check request.method and request.url
 
-  var handleGet = function() {
-    console.log('get called');
-  };
-  var handlePost = function() {
-    
-    console.log('post called');
-  };
   let body = [];
-  if (request.method === 'GET') {
-    handleGet();
-  } else if (request.method === 'POST') {
-    handlePost(request); 
-    //  {"username":"asd","text":"sdf","roomname":"lobby"}
-    request.on('data', (chunk) => {
-      body.push(chunk);
-    }).on('end', () => {
-      body = Buffer.concat(body).toString();
-      console.log(body);
-      messages.results.push(body);
-    // at this point, `body` has the entire request body stored in it as a string
-    }); 
+  if (request.method === 'GET' && request.url === '/classes/messages') {
+    response.end(JSON.stringify(messages));
+  } else if (request.method === 'POST' ) {
+    request.on('data', (input) => {
+      var parsed = JSON.parse(input);
+      parsed.createdAt = new Date();
+      // parsed.objectID = new ObjectID();
+      messages.results.push(parsed);
+      console.log(parsed);
+      response.end(JSON.stringify(messages));
+    })
   }
-  // console.log(response._data);
-  // console.log(request)
+
+
   // Make sure to always call response.end() - Node may not send
   // anything back to the client until you do. The string you pass to
   // response.end() will be the body of the response - i.e. what shows
@@ -87,7 +78,6 @@ exports.requestHandler = function(request, response) {
   //
   // Calling .end "flushes" the response's internal buffer, forcing
   // node to actually send all the data over to the client.
-  response.end(JSON.stringify(messages));
 };
 
 
